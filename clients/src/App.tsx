@@ -1,35 +1,51 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import React, { FC, ReactElement, useEffect, useState } from 'react';
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+const App: FC = (): ReactElement => {
+  const[title,setTitle]=useState('')
+  const[dats,setData]=useState([])
+  const submit=(e:React.FormEvent)=>{
+e.preventDefault()
+fetch('http://localhost:3000/decks',{
+  method:'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body:JSON.stringify({
+    title
+  })
+})
+  }
+
+  useEffect(() => {
+   const fetchData=async()=>{
+await fetch("http://localhost:3000/decks").then(async(data)=>{
+  const dat= await data.json()
+  setData(dat)
+})
+   }
+   fetchData()
+  
+   
+  }, [])
+  
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    {dats?.length>0&&dats.map((data:{title:'',id:''})=>(
+      <div className='boxs'>
+      <p>{data?.title}</p>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+    ))}
+    <form onSubmit={submit}>
+    <label htmlFor="deck-title">DECK TITLE</label>
+    <input type='text' value={title} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{
+      setTitle(e.target.value)
+    }}/>
+    <button>Create Deck</button>
+    </form>
     </>
-  )
-}
+  );
+};
 
-export default App
+export default App;
