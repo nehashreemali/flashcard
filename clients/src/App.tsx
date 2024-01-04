@@ -1,48 +1,56 @@
 import React, { FC, ReactElement, useEffect, useState } from 'react';
 import './App.css'
-
+import {Link} from 'react-router-dom'
+import { createDeck } from './apis/createDeck';
+import { getDecks } from './apis/getDeck';
+import { deleteDecks } from './apis/deleteDecks';
 const App: FC = (): ReactElement => {
   const[title,setTitle]=useState('')
-  const[dats,setData]=useState([])
-  const submit=(e:React.FormEvent)=>{
-e.preventDefault()
-fetch('http://localhost:3000/decks',{
-  method:'POST',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body:JSON.stringify({
-    title
-  })
-})
-  }
+  const [dats, setData] = useState<{ title: string; _id: string }[]>([]);
 
-  useEffect(() => {
+  const submit=async(e:React.FormEvent)=>{
+e.preventDefault()
+createDeck(title)
+setTitle('')
+  }
+ 
    const fetchData=async()=>{
-await fetch("http://localhost:3000/decks").then(async(data)=>{
-  const dat= await data.json()
+const dat = await getDecks()
   setData(dat)
-})
-   }
-   fetchData()
+}
+   
+   useEffect(() => {
+ fetchData()
+  }, []);
   
    
-  }, [])
   
-
+  const deletes = async (id: string) => {
+   deleteDecks(id)
+  };
+  useEffect(() => {
+    fetchData();
+  }, [submit,deletes]);
   return (
     <>
-    {dats?.length>0&&dats.map((data:{title:'',id:''})=>(
-      <div className='boxs'>
-      <p>{data?.title}</p>
-      </div>
-    ))}
+     <ul className='decks'>
+      {dats?.length > 0 &&
+        dats.map((data: { title: string; _id: string }) => (
+          <li key={data._id}>
+          <Link to={`deck/${data?._id}`}>  {data.title}</Link>
+            <div className='but2'>            <button  onClick={() => deletes(data._id)}>Delete</button>
+            </div>
+
+          </li>
+        ))}
+    </ul>
     <form onSubmit={submit}>
-    <label htmlFor="deck-title">DECK TITLE</label>
-    <input type='text' value={title} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{
+    <label htmlFor="deck-title" className='title'>DECK TITLE</label>
+    <input type='text' className='boxinput' value={title} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{
       setTitle(e.target.value)
     }}/>
-    <button>Create Deck</button>
+
+    <button className='but1'>Create Deck</button>
     </form>
     </>
   );

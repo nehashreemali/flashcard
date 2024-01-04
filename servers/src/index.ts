@@ -19,6 +19,23 @@ app.get('/decks', async (req: Request, res: Response) => {
       res.status(500).send('Internal Server Error');
     }
   });
+  app.delete("/decks/:deckId", async (req: Request, res: Response) => {
+    const deckId = req.params.deckId;
+
+    try {
+        const deck = await DeckModel.findByIdAndDelete(deckId);
+
+        if (!deck) {
+            // If deck is null, the specified deckId was not found
+            return res.status(404).json({ error: 'Deck not found' });
+        }
+
+        res.json(deck);
+    } catch (error) {
+        console.error('Error deleting deck:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
 
 app.post("/decks", async(req:Request, res:Response) => {
     const newDeck= new DeckModel({

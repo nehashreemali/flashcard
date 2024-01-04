@@ -40,10 +40,36 @@
 .read-the-docs {
   color: #888;
 }
-.boxs {
+.decks {
+  display: grid;
+  width: 600px;
+  margin: 0 auto;
+  grid-gap: 10px;
+  grid-template-columns: repeat(3, 1fr);
+  margin-bottom: 50px;
+}
+.decks li {
+  display: block;
+  height: 120px;
+  background: white;
+  border: 1px solid white;
+  border-radius: 10px;
+  color: black;
+  padding-top: 20px;
+}
+.but2 {
+  margin-top: 20px;
+}
+.but1 {
+  margin-left: 10px;
   background-color: white;
   color: black;
-  padding: 50;
-  margin: 20;
-  height: 10rem;
+}
+.title {
+  margin-right: 10px;
+  font-size: 20px;
+}
+.boxinput {
+  height: 30px;
+  width: 300px;
 }
