@@ -3,54 +3,25 @@ import mongoose from 'mongoose';
 import {config} from 'dotenv'
 import cors from 'cors'
 import DeckModel from './Deck';
+import { getDeck } from './controller/getDeckController';
+import { deleteDeck } from './controller/deleteDeckController';
+import { createDeck } from './Controller/createDeckController';
 config()
 const app = express();
 const PORT = 3000;
 app.use(cors())
 app.use(express.json())
 
-app.get('/decks', async (req: Request, res: Response) => {
-    try {
-      const data = await DeckModel.find();
-      console.log(data, 'das');
-      res.send(data);
-    } catch (error) {
-      console.error('Error fetching decks:', error);
-      res.status(500).send('Internal Server Error');
-    }
-  });
-  app.delete("/decks/:deckId", async (req: Request, res: Response) => {
-    const deckId = req.params.deckId;
+app.get('/decks', getDeck);
+  app.delete("/decks/:deckId", deleteDeck);
 
-    try {
-        const deck = await DeckModel.findByIdAndDelete(deckId);
+app.post("/decks", createDeck);
 
-        if (!deck) {
-            // If deck is null, the specified deckId was not found
-            return res.status(404).json({ error: 'Deck not found' });
-        }
-
-        res.json(deck);
-    } catch (error) {
-        console.error('Error deleting deck:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-});
-
-app.post("/decks", async(req:Request, res:Response) => {
-    const newDeck= new DeckModel({
-        title:req.body.title
-    })
-
-    const decks= await newDeck.save()
-    res.json(decks)
-});
-
-mongoose.connect(process.env.MONGO_URI!)
-    .then(() => {
+mongoose.connect(process.env.MONGO_URI!).then(() => {
+    console.log(`Connected to MongoDB`);
+    app.listen(PORT, () => {
         console.log(`Listening on Port ${PORT}`);
-        app.listen(PORT);
-    })
-    .catch(error => {
-        console.error('Error connecting to MongoDB:', error);
     });
+}).catch(error => {
+    console.error('Error connecting to MongoDB:', error);
+});
